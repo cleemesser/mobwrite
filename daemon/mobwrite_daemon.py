@@ -333,9 +333,7 @@ class BufferObj:
 
     # Initialize the buffer with a set number of slots.
     # Null characters form dividers between each slot.
-    array = []
-    for x in xrange(size - 1):
-      array.append("\0")
+    array = ["\0" for _ in xrange(size - 1)]
     self.data = "".join(array)
 
     # lock_views must be acquired by the caller to prevent simultaneous

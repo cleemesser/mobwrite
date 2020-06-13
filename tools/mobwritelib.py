@@ -72,17 +72,17 @@ def download(url, docnames):
           continue
         value = value[div + 1:]
 
-      if name == "f" or name == "F":
+      if name in ["f", "F"]:
         # Remember the docname.
         docname = value
-      elif docname and (name == "d" or name == "D"):
+      elif docname and name in ["d", "D"]:
         # When sent a 'r:' command, the server is expected to reply with 'd:'.
         if value == "=0":
           text = ""
         elif value and value[0] == "+":
           text = urllib.unquote(value[1:])
         results[docname] = text
-      elif docname and (name == "r" or name == "R"):
+      elif docname and name in ["r", "R"]:
         # The server should not reply with 'r:', but if it does, the answer is
         # just as informative as 'd:'.
         results[docname] = urllib.unquote(value)
@@ -192,7 +192,7 @@ def uniqueId():
   id = soup[random.randint(0, len(soup) - 1)]
   # Subsequent characters may include these.
   soup += '0123456789-_:.'
-  for x in range(7):
+  for _ in range(7):
     id += soup[random.randint(0, len(soup) - 1)]
   # Don't allow IDs with '--' in them since it might close a comment.
   if id.find("--") != -1:

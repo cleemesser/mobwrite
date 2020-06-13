@@ -327,10 +327,7 @@ class diff_match_patch:
       # Walk the front path one step.
       v_map1.append({})
       for k in xrange(-d, d + 1, 2):
-        if k == -d or k != d and v1[k - 1] < v1[k + 1]:
-          x = v1[k + 1]
-        else:
-          x = v1[k - 1] + 1
+        x = v1[k + 1] if k == -d or k != d and v1[k - 1] < v1[k + 1] else v1[k - 1] + 1
         y = x - k
         if doubleEnd:
           footstep = (x, y)
@@ -366,10 +363,7 @@ class diff_match_patch:
         # Walk the reverse path one step.
         v_map2.append({})
         for k in xrange(-d, d + 1, 2):
-          if k == -d or k != d and v2[k - 1] < v2[k + 1]:
-            x = v2[k + 1]
-          else:
-            x = v2[k - 1] + 1
+          x = v2[k + 1] if k == -d or k != d and v2[k - 1] < v2[k + 1] else v2[k - 1] + 1
           y = x - k
           footstep = (text1_length - x, text2_length - y)
           if not front and footstep in footsteps:
@@ -501,7 +495,7 @@ class diff_match_patch:
       The number of characters common to the start of each string.
     """
     # Quick check for common null cases.
-    if not text1 or not text2 or text1[0] != text2[0]:
+    if not (text1 and text2 and text1[0] == text2[0]):
       return 0
     # Binary search.
     # Performance analysis: http://neil.fraser.name/news/2007/10/09/
@@ -529,7 +523,7 @@ class diff_match_patch:
       The number of characters common to the end of each string.
     """
     # Quick check for common null cases.
-    if not text1 or not text2 or text1[-1] != text2[-1]:
+    if not (text1 and text2 and text1[-1] == text2[-1]):
       return 0
     # Binary search.
     # Performance analysis: http://neil.fraser.name/news/2007/10/09/
@@ -660,10 +654,7 @@ class diff_match_patch:
           # Throw away the previous equality (it needs to be reevaluated).
           if len(equalities) != 0:
             equalities.pop()
-          if len(equalities):
-            pointer = equalities[-1]
-          else:
-            pointer = -1
+          pointer = equalities[-1] if len(equalities) else -1
           length_changes1 = 0  # Reset the counters.
           length_changes2 = 0
           lastequality = None
@@ -697,7 +688,7 @@ class diff_match_patch:
       Returns:
         The score.
       """
-      if not one or not two:
+      if not (one and two):
         # Edges are the best.
         return 5
 
@@ -708,7 +699,7 @@ class diff_match_patch:
       # rather than force total conformity.
       score = 0
       # One point for non-alphanumeric.
-      if not one[-1].isalnum() or not two[0].isalnum():
+      if not (one[-1].isalnum() and two[0].isalnum()):
         score += 1
         # Two points for whitespace.
         if one[-1].isspace() or two[0].isspace():
@@ -1024,10 +1015,7 @@ class diff_match_patch:
     Returns:
       Source text.
     """
-    text = []
-    for (op, data) in diffs:
-      if op != self.DIFF_INSERT:
-        text.append(data)
+    text = [data for (op, data) in diffs if op != self.DIFF_INSERT]
     return "".join(text)
 
   def diff_text2(self, diffs):
@@ -1039,10 +1027,7 @@ class diff_match_patch:
     Returns:
       Destination text.
     """
-    text = []
-    for (op, data) in diffs:
-      if op != self.DIFF_DELETE:
-        text.append(data)
+    text = [data for (op, data) in diffs if op != self.DIFF_DELETE]
     return "".join(text)
 
   def diff_levenshtein(self, diffs):
@@ -1603,7 +1588,7 @@ class diff_match_patch:
     # Add some padding on end of last diff.
     patch = patches[-1]
     diffs = patch.diffs
-    if not diffs or diffs[-1][0] != self.DIFF_EQUAL:
+    if not (diffs and diffs[-1][0] == self.DIFF_EQUAL):
       # Add nullPadding equality.
       diffs.append((self.DIFF_EQUAL, nullPadding))
       patch.length1 += paddingLength
@@ -1711,9 +1696,7 @@ class diff_match_patch:
     Returns:
       Text representation of patches.
     """
-    text = []
-    for patch in patches:
-      text.append(str(patch))
+    text = [str(patch) for patch in patches]
     return "".join(text)
 
   def patch_fromText(self, textline):

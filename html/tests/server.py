@@ -72,10 +72,12 @@ def parseXml(filename):
     conversation = []
     randomId = str(random.random())[2:]
     for child in test.childNodes:
-      if child.nodeType == child.ELEMENT_NODE:
-        if child.tagName == QUESTION or child.tagName == ANSWER:
-          text = formatText(getText(child.childNodes), randomId)
-          conversation.append((child.tagName, text))
+      if child.nodeType == child.ELEMENT_NODE and child.tagName in [
+          QUESTION,
+          ANSWER,
+      ]:
+        text = formatText(getText(child.childNodes), randomId)
+        conversation.append((child.tagName, text))
     conversations.append((name, conversation))
   return conversations
 
